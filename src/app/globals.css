@@ -1,26 +1,28 @@
+/* app/globals.css */
+
+/* Import Tailwind v4 */
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Define your custom theme here */
+@theme {
+  /* Custom colors – use any valid CSS color format (hex, oklch, hsl, etc.) */
+  --color-accent: #FFD3AC;          /* main soft peach */
+  --color-accent-dark: #E7C2AE;     /* darker peach for hover */
+  --color-accent-light: #FFE8D1;    /* lighter variant if needed */
+
+  /* Optional: add more theme variables if you want */
+  --color-dark: #0f172a;            /* your navbar/footer dark */
+  --color-background: #ffffff;      /* light bg */
+  --color-text-main: #1e293b;       /* main text */
+
+  /* You can also customize other things like border radius, spacing, etc. */
+  --radius-lg: 12px;
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* Any other custom CSS or resets below */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  @apply bg-background text-text-main;
 }
+
+/* ... rest of your globals.css ... */
