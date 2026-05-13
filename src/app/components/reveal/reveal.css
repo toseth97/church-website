@@ -1,0 +1,32 @@
+:root {
+    --church-accent: #D7A96B;
+    --church-accent-2: #F2C79B;
+    --church-cream: #FBF7F0;
+    --church-ink: #0F172A;
+    --church-muted: #64748B;
+    --church-border: rgba(215, 169, 107, .28)
+}
+
+/* Reveal animation primitives */
+.reveal-item {
+    opacity: 0;
+    transform: translateY(10px);
+    filter: saturate(.98) blur(2px);
+    transition: opacity .7s ease, transform .7s cubic-bezier(.2, .8, .2, 1), filter .7s ease;
+    will-change: opacity, transform, filter
+}
+
+.reveal-item--visible {
+    opacity: 1;
+    transform: translateY(0);
+    filter: none
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .reveal-item {
+        opacity: 1;
+        transform: none;
+        filter: none;
+        transition: none
+    }
+}

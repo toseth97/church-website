@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import Reveal from "../components/reveal/Reveal.jsx";
 
 export default function BlogPage() {
   return (
@@ -8,7 +9,7 @@ export default function BlogPage() {
         {/* SERVE THE WORLD */}
       <section className="relative py-32">
         <div className="absolute inset-0">
-          <img src="/images/church.jpg" alt="Church" className="w-full h-full object-cover" />
+          <Image src="/images/church.jpg" alt="Church" fill className="object-cover" priority />
           <div className="absolute" />
         </div>
 

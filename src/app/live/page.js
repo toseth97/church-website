@@ -1,10 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-function FadeIn({ children }) {
-  return <div className="animate-[fadein_450ms_ease-out_forwards]">{children}</div>;
-}
+import Reveal from "../components/reveal/Reveal.jsx";
 
 export default function LivePage() {
   const [current, setCurrent] = useState({ isLive: false, audioUrl: null, startedAt: null });
@@ -38,7 +35,7 @@ export default function LivePage() {
     <main className="w-full overflow-x-hidden">
       <section className="py-16 bg-[#FAF7F3]">
         <div className="max-w-4xl mx-auto px-6">
-          <FadeIn>
+          <Reveal delayMs={80}>
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div>
                 <p className="uppercase text-xs font-bold tracking-widest text-gray-500 mb-2">Live</p>
@@ -47,6 +44,7 @@ export default function LivePage() {
                   {current?.isLive ? "You can join now." : "No live stream currently."}
                 </p>
               </div>
+
               <div
                 className={
                   "inline-flex items-center justify-center px-4 py-2 rounded-full font-bold text-sm " +
@@ -91,7 +89,7 @@ export default function LivePage() {
                 to { opacity: 1; transform: translateY(0); }
               }
             `}</style>
-          </FadeIn>
+          </Reveal>
         </div>
       </section>
     </main>

@@ -1,11 +1,12 @@
 import Image from "next/image";
+import Reveal from "./components/reveal/Reveal.jsx";
 
 export default function Home() {
   return (
     <main className="w-full overflow-x-hidden">
 
       {/* ================= HERO SECTION ================= */}
-      <section className="relative h-[90vh] w-full">
+      <section className="relative h-[90vh] w-full overflow-hidden">
         <Image
           src="/images/hero.jpg"
           alt="Church worship"
@@ -19,23 +20,25 @@ export default function Home() {
 
         {/* Text content */}
         <div className="relative z-10 max-w-7xl mx-auto px-6 h-full flex items-center">
-          <div className="max-w-xl text-white">
-            <p className="uppercase text-sm tracking-widest mb-3">
-              Welcome to our church
-            </p>
+          <Reveal delayMs={60}>
+            <div className="max-w-xl text-white">
+              <p className="uppercase text-sm tracking-widest mb-3 text-accent-light/90">
+                Welcome to our church
+              </p>
 
-            <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-6">
-              BECOME A PART OF <br /> OUR COMMUNITY
-            </h1>
+              <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-6">
+                BECOME A PART OF <br /> OUR COMMUNITY
+              </h1>
 
-            <button className="bg-[#F2C79B] text-black px-6 py-3 font-semibold rounded-md hover:bg-[#e6b985] transition">
-              Learn More
-            </button>
+              <button className="bg-[#F2C79B] text-black px-6 py-3 font-semibold rounded-md church-animate-float hover:opacity-90 transition">
+                Learn More
+              </button>
 
-            <p className="text-sm text-gray-300 mt-6 max-w-md">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do.
-            </p>
-          </div>
+              <p className="text-sm text-white/70 mt-6 max-w-md">
+                Where faith, love, and worship come together.
+              </p>
+            </div>
+          </Reveal>
         </div>
       </section>
 

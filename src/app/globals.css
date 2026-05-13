@@ -6,14 +6,20 @@
 /* Define your custom theme here */
 @theme {
   /* Custom colors – use any valid CSS color format (hex, oklch, hsl, etc.) */
-  --color-accent: #FFD3AC;          /* main soft peach */
-  --color-accent-dark: #E7C2AE;     /* darker peach for hover */
-  --color-accent-light: #FFE8D1;    /* lighter variant if needed */
+  --color-accent: #FFD3AC;
+  /* main soft peach */
+  --color-accent-dark: #E7C2AE;
+  /* darker peach for hover */
+  --color-accent-light: #FFE8D1;
+  /* lighter variant if needed */
 
   /* Optional: add more theme variables if you want */
-  --color-dark: #0f172a;            /* your navbar/footer dark */
-  --color-background: #ffffff;      /* light bg */
-  --color-text-main: #1e293b;       /* main text */
+  --color-dark: #0f172a;
+  /* your navbar/footer dark */
+  --color-background: #ffffff;
+  /* light bg */
+  --color-text-main: #1e293b;
+  /* main text */
 
   /* You can also customize other things like border radius, spacing, etc. */
   --radius-lg: 12px;
@@ -21,8 +27,45 @@
 }
 
 /* Any other custom CSS or resets below */
+
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   @apply bg-background text-text-main;
 }
 
-/* ... rest of your globals.css ... */
+/* Church-themed background glow */
+.bg-church {
+  background:
+    radial-gradient(900px 500px at 10% -10%, rgba(242, 199, 123, 0.25), transparent 55%),
+    radial-gradient(900px 500px at 90% 0%, rgba(215, 169, 107, 0.18), transparent 55%),
+    radial-gradient(700px 500px at 60% 110%, rgba(255, 232, 209, 0.22), transparent 60%),
+    linear-gradient(180deg, #ffffff 0%, #fbf7f0 60%, #ffffff 100%);
+}
+
+/* Subtle floating / shine used by buttons/cards */
+@keyframes churchFloat {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  50% {
+    transform: translate3d(0, -6px, 0);
+  }
+
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .church-animate-float {
+    animation: none !important;
+  }
+}

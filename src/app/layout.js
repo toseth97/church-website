@@ -5,7 +5,7 @@ import Footer from "./components/footer.jsx";
 export default function RootLayout({ children }) {
   return (
     
-    <html lang="en">
+    <html lang="en" className="bg-church">
       <body className="pt-20 overflow-x-hidden flex flex-col min-h-screen">
         <Navbar />
 
