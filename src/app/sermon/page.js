@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import Reveal from "../components/reveal/Reveal.jsx";
 
 export default function SermonPage() {
   return (
@@ -18,12 +19,14 @@ export default function SermonPage() {
 
         <div className="absolute inset-0">
           <div className="max-w-7xl mx-auto px-6 text-black pt-32">
-            <p className="uppercase text-sm font-bold tracking-widest mb-3">
-              Sermon
-            </p>
-            <h1 className="text-4xl md:text-4xl font-bold max-w-xl">
-              TAKE PART IN OUR SERMON
-            </h1>
+            <Reveal delayMs={60}>
+              <p className="uppercase text-sm font-bold tracking-widest mb-3">
+                Sermon
+              </p>
+              <h1 className="text-4xl md:text-4xl font-bold max-w-xl">
+                TAKE PART IN OUR SERMON
+              </h1>
+            </Reveal>
           </div>
         </div>
       </section>

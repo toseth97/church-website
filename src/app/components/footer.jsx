@@ -26,7 +26,7 @@ export default function Footer() {
           <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
           <ul className="space-y-2">
             <li>
-              <Link className="text-sm hover:text-red-400 transition duration-200" href="/">
+<Link className="text-sm hover:text-dark transition duration-200" href="/">
                 Home
               </Link>
             </li>

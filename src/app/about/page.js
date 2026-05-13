@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { FaFacebook, FaTwitter, FaLinkedinIn } from "react-icons/fa";
+import Reveal from "../components/reveal/Reveal.jsx";
 
 export default function AboutPage() {
   return (
@@ -26,12 +27,18 @@ export default function AboutPage() {
 
       {/* LOVE AND COMPASSION */}
       <section className="max-w-7xl mx-auto px-6 py-24 text-center">
-        <p className="uppercase text-xs font-bold tracking-widest mb-3">
-          Welcome to our church
-        </p>
-        <h2 className="text-3xl md:text-4xl font-bold mb-6">
-          LOVE AND COMPASSION
-        </h2>
+        {/* Animations */}
+
+        <Reveal delayMs={60}>
+          <p className="uppercase text-xs font-bold tracking-widest mb-3">
+            Welcome to our church
+          </p>
+        </Reveal>
+        <Reveal delayMs={120}>
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+            LOVE AND COMPASSION
+          </h2>
+        </Reveal>
         <p className="max-w-3xl mx-auto text-gray-600 mb-16">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
           eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad

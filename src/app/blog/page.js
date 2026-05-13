@@ -14,19 +14,21 @@ export default function BlogPage() {
         </div>
 
         <div className="relative max-w-6xl mx-auto px-6">
-          <Link href="/blog/how-to-show-compassion">
-            <div className="bg-white p-12 md:p-16 max-w-xl shadow-lg cursor-pointer hover:shadow-2xl transition">
-              <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                WE WANT TO <br /> SERVE THE WORLD <br /> AROUND US
-              </h2>
-              <p className="text-gray-600 mb-6">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.
-              </p>
-              <button className="bg-[#F2C79B] text-black font-bold px-8 py-3 rounded-md hover:opacity-90 transition">
-                VISIT
-              </button>
-            </div>
-          </Link>
+          <Reveal delayMs={60}>
+            <Link href="/blog/how-to-show-compassion">
+              <div className="bg-white p-12 md:p-16 max-w-xl shadow-lg cursor-pointer hover:shadow-2xl transition">
+                <h2 className="text-3xl md:text-4xl font-bold mb-6">
+                  WE WANT TO <br /> SERVE THE WORLD <br /> AROUND US
+                </h2>
+                <p className="text-gray-600 mb-6">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.
+                </p>
+                <button className="bg-[#F2C79B] text-black font-bold px-8 py-3 rounded-md hover:opacity-90 transition">
+                  VISIT
+                </button>
+              </div>
+            </Link>
+          </Reveal>
         </div>
       </section>
 
