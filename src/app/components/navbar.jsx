@@ -1,4 +1,5 @@
 import Link from "next/link";
+import NavbarAdminClient from "./navbarAdminClient.jsx";
 
 export default function Navbar() {
   return (
@@ -17,6 +18,7 @@ export default function Navbar() {
             { name: "About Us", path: "/about" },
             { name: "Sermon", path: "/sermon" },
             { name: "Blog", path: "/blog" },
+            { name: "Live Stream", path: "/live" },
           ].map((link) => (
             <li key={link.name}>
               <Link
@@ -33,7 +35,15 @@ export default function Navbar() {
               </Link>
             </li>
           ))}
+
+          {/* Admin link (only if authenticated) */}
+          <li className="uppercase">
+            {/* Client component handles visibility */}
+            <NavbarAdminClient />
+          </li>
+
         </ul>
+
 
         {/* Contact Button */}
         <Link
