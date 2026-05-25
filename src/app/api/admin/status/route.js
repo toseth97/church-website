@@ -1,12 +1,23 @@
 import { NextResponse } from "next/server";
-import { requireAdmin } from "@/server/lib/adminAuth";
+import { requireAdmin } from "@/server/lib/auth.js";
 
 export async function GET(req) {
-  const admin = await requireAdmin(req);
-  if (!admin.ok) {
+  try {
+    const result = await requireAdmin(req);
+    if (!result.ok) {
+      return NextResponse.json({ ok: false });
+    }
+
+    return NextResponse.json({
+      ok: true,
+      admin: {
+        id: result.admin._id,
+        name: result.admin.name,
+        email: result.admin.email,
+        role: result.admin.role,
+      },
+    });
+  } catch (err) {
     return NextResponse.json({ ok: false });
   }
-
-  return NextResponse.json({ ok: true });
 }
-

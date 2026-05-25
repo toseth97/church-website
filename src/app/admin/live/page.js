@@ -7,16 +7,14 @@ function StatusPill({ live }) {
   return (
     <span
       className={
-        "inline-flex items-center gap-2 text-xs font-bold px-3 py-1 rounded-full " +
+        "inline-flex items-center gap-2 text-sm font-bold px-4 py-2 rounded-full " +
         (live ? "bg-red-100 text-red-800" : "bg-gray-100 text-gray-600")
       }
     >
       <span
         className={
-          "h-2 w-2 rounded-full " +
-          (live
-            ? "bg-red-500 animate-ping"
-            : "bg-gray-400")
+          "h-2.5 w-2.5 rounded-full " +
+          (live ? "bg-red-500 animate-ping" : "bg-gray-400")
         }
       />
       {live ? "LIVE" : "OFFLINE"}
@@ -27,9 +25,12 @@ function StatusPill({ live }) {
 export default function AdminLivePage() {
   const router = useRouter();
   const [audioUrl, setAudioUrl] = useState("");
+  const [videoUrl, setVideoUrl] = useState("");
+  const [title, setTitle] = useState("");
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState({ isLive: false, audioUrl: null, startedAt: null });
+  const [status, setStatus] = useState({ isLive: false, audioUrl: null, videoUrl: null, title: null, startedAt: null });
   const [error, setError] = useState("");
+  const [history, setHistory] = useState([]);
 
   async function refresh() {
     const res = await fetch("/api/live-stream/status");
@@ -37,9 +38,16 @@ export default function AdminLivePage() {
     if (data?.current) setStatus(data.current);
   }
 
+  async function loadHistory() {
+    const res = await fetch("/api/live-stream/history?limit=10");
+    const data = await res.json().catch(() => ({}));
+    if (data?.history) setHistory(data.history);
+  }
+
   useEffect(() => {
     refresh();
-    const t = setInterval(refresh, 2500);
+    loadHistory();
+    const t = setInterval(refresh, 5000);
     return () => clearInterval(t);
   }, []);
 
@@ -50,7 +58,7 @@ export default function AdminLivePage() {
       const res = await fetch("/api/live-stream/start", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ audioUrl }),
+        body: JSON.stringify({ audioUrl, videoUrl, title: title || "Live Worship Service" }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data?.ok) {
@@ -58,6 +66,7 @@ export default function AdminLivePage() {
         return;
       }
       await refresh();
+      await loadHistory();
     } finally {
       setLoading(false);
     }
@@ -70,88 +79,150 @@ export default function AdminLivePage() {
       const res = await fetch("/api/live-stream/stop", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ savedAudioUrl: audioUrl || status.audioUrl }),
       });
-
       const data = await res.json().catch(() => ({}));
       if (!res.ok || !data?.ok) {
         setError(data?.error || "Failed to stop");
         return;
       }
-
       setAudioUrl("");
+      setVideoUrl("");
+      setTitle("");
       await refresh();
+      await loadHistory();
     } finally {
       setLoading(false);
     }
   }
 
-  async function logout() {
-    await fetch("/api/admin/logout", { method: "POST" }).catch(() => {});
-    router.push("/admin/login");
-  }
-
   return (
-    <main className="max-w-3xl mx-auto px-6 py-16">
-      <div className="bg-white rounded-xl shadow-md p-8">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Live Stream Control</h1>
-            <p className="text-gray-600 mb-4">Start/stop the church audio stream.</p>
+    <div>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Live Stream</h1>
+        <p className="text-gray-500 mt-1">Start and stop church live broadcasts</p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main Control */}
+        <div className="lg:col-span-2">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">Stream Control</h2>
+                <p className="text-sm text-gray-500 mt-1">Manage your live broadcast</p>
+              </div>
+              <StatusPill live={status?.isLive} />
+            </div>
+
+            {error && <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-4 text-sm">{error}</div>}
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Stream Title</label>
+                <input
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="w-full p-3 rounded-lg border border-gray-200 outline-none focus:ring-2 focus:ring-[#F2C79B] transition"
+                  placeholder="e.g. Sunday Worship Service"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Audio URL</label>
+                <input
+                  value={audioUrl}
+                  onChange={(e) => setAudioUrl(e.target.value)}
+                  className="w-full p-3 rounded-lg border border-gray-200 outline-none focus:ring-2 focus:ring-[#F2C79B] transition"
+                  placeholder="https://.../audio.mp3 or https://.../stream.m3u8"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">Video URL (YouTube embed)</label>
+                <input
+                  value={videoUrl}
+                  onChange={(e) => setVideoUrl(e.target.value)}
+                  className="w-full p-3 rounded-lg border border-gray-200 outline-none focus:ring-2 focus:ring-[#F2C79B] transition"
+                  placeholder="https://www.youtube.com/embed/..."
+                />
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  disabled={loading || status.isLive}
+                  onClick={startStream}
+                  className="flex-1 bg-black text-white font-semibold py-3 rounded-lg hover:bg-gray-800 transition disabled:opacity-60"
+                >
+                  {loading ? "Starting..." : "▶ Start Stream"}
+                </button>
+                <button
+                  disabled={loading || !status.isLive}
+                  onClick={stopStream}
+                  className="flex-1 bg-red-600 text-white font-semibold py-3 rounded-lg hover:bg-red-700 transition disabled:opacity-60"
+                >
+                  {loading ? "Stopping..." : "⏹ Stop Stream"}
+                </button>
+              </div>
+            </div>
+
+            {/* Current Status Info */}
+            {status?.isLive && (
+              <div className="mt-6 p-4 bg-red-50 rounded-lg border border-red-100">
+                <p className="text-sm font-semibold text-red-800 mb-1">🔴 Currently Streaming</p>
+                {status.title && <p className="text-sm text-red-600">{status.title}</p>}
+                {status.startedAt && (
+                  <p className="text-xs text-red-500 mt-1">
+                    Started: {new Date(status.startedAt).toLocaleString()}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
-          <StatusPill live={status?.isLive} />
         </div>
 
-        {error ? <p className="text-red-600 text-sm mb-4">{error}</p> : null}
-
-        <div className="space-y-4">
-          <div>
-            <label className="text-sm font-semibold">Audio URL</label>
-            <input
-              value={audioUrl}
-              onChange={(e) => setAudioUrl(e.target.value)}
-              className="mt-2 w-full p-4 rounded-md border border-gray-200 outline-none focus:ring-2 focus:ring-[#F2C79B]"
-              placeholder="https://.../audio.mp3 or https://.../stream.m3u8"
-            />
+        {/* Sidebar */}
+        <div className="space-y-6">
+          {/* Quick Info */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h3 className="font-bold text-gray-900 mb-4">Stream Info</h3>
+            <div className="space-y-3 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-500">Status</span>
+                <span className={status?.isLive ? "text-red-600 font-semibold" : "text-gray-600"}>
+                  {status?.isLive ? "Live" : "Offline"}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Audio</span>
+                <span className="text-gray-600">{status?.audioUrl ? "✓" : "—"}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Video</span>
+                <span className="text-gray-600">{status?.videoUrl ? "✓" : "—"}</span>
+              </div>
+            </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3">
-            <button
-              disabled={loading || status.isLive}
-              onClick={startStream}
-              className="flex-1 bg-black text-white font-semibold px-6 py-3 rounded-md hover:bg-gray-800 transition disabled:opacity-60"
-            >
-              {loading ? "Starting..." : "Start Stream"}
-            </button>
-            <button
-              disabled={loading || !status.isLive}
-              onClick={stopStream}
-              className="flex-1 bg-red-600 text-white font-semibold px-6 py-3 rounded-md hover:bg-red-700 transition disabled:opacity-60"
-            >
-              {loading ? "Stopping..." : "Stop Stream"}
-            </button>
-          </div>
-
-          <div className="text-sm text-gray-600">
-            <p>
-              Current: <span className="font-semibold">{status?.audioUrl ? "Yes" : "No"}</span>
-            </p>
-            {status?.startedAt ? (
-              <p className="mt-1">Started at: {new Date(status.startedAt).toLocaleString()}</p>
-            ) : null}
-          </div>
-
-          <div className="pt-4 border-t border-gray-100">
-            <button
-              onClick={logout}
-              className="text-sm font-semibold text-gray-700 hover:underline"
-            >
-              Logout
-            </button>
+          {/* Recent History */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h3 className="font-bold text-gray-900 mb-4">Recent Streams</h3>
+            {history.length === 0 ? (
+              <p className="text-sm text-gray-400">No stream history</p>
+            ) : (
+              <div className="space-y-3">
+                {history.slice(0, 5).map((h, i) => (
+                  <div key={i} className="text-sm border-b border-gray-50 pb-2">
+                    <p className="text-gray-700 font-medium truncate">{h.title || "Live Stream"}</p>
+                    <p className="text-gray-400 text-xs">
+                      {h.startedAt ? new Date(h.startedAt).toLocaleDateString() : "—"}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
-

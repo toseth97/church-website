@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
-import { adminLogout } from "@/server/lib/adminAuth";
+import { adminLogoutHandler } from "@/server/lib/auth.js";
 
 export async function POST() {
-  adminLogout();
-  return NextResponse.json({ ok: true });
+  try {
+    await adminLogoutHandler();
+    return NextResponse.json({ ok: true });
+  } catch (err) {
+    return NextResponse.json({ ok: false, error: "Logout failed" }, { status: 500 });
+  }
 }
-

@@ -1,19 +1,30 @@
 import { NextResponse } from "next/server";
-import { stopStream } from "@/server/lib/liveStore";
-import { requireAdmin } from "@/server/lib/adminAuth";
+import { requireAdmin } from "@/server/lib/auth.js";
+import connectDB from "@/server/lib/db.js";
+import LiveStream from "@/server/models/LiveStream.js";
 
 export async function POST(req) {
-  const admin = await requireAdmin(req);
-  if (!admin.ok) return admin.res;
-
-  const body = await req.json().catch(() => ({}));
-  const { savedAudioUrl } = body || {};
-
   try {
-    const record = stopStream({ savedAudioUrl });
-    return NextResponse.json({ ok: true, record });
-  } catch (e) {
-    return NextResponse.json({ ok: false, error: e?.message || "Failed" }, { status: 400 });
+    const authResult = await requireAdmin(req);
+    if (!authResult.ok) {
+      return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+    }
+
+    await connectDB();
+
+    const currentStream = await LiveStream.findOne({ isLive: true });
+
+    if (!currentStream) {
+      return NextResponse.json({ ok: false, error: "No active stream to stop" }, { status: 400 });
+    }
+
+    currentStream.isLive = false;
+    currentStream.stoppedAt = new Date();
+    await currentStream.save();
+
+    return NextResponse.json({ ok: true, record: currentStream });
+  } catch (err) {
+    console.error("Live stop error:", err);
+    return NextResponse.json({ ok: false, error: err.message || "Failed" }, { status: 400 });
   }
 }
-

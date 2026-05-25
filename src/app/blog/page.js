@@ -1,128 +1,155 @@
 import Image from "next/image";
 import Link from "next/link";
 import Reveal from "../components/reveal/Reveal.jsx";
+import HeroSection from "../components/HeroSection.jsx";
 
-export default function BlogPage() {
+export const dynamic = "force-dynamic";
+
+async function getEvents() {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/api/events?limit=20`, {
+      cache: "no-store",
+    });
+    const data = await res.json();
+    return data.ok ? data.events : [];
+  } catch {
+    return [];
+  }
+}
+
+export default async function BlogPage() {
+  const events = await getEvents();
+  const featuredEvent = events.find((e) => e.isFeatured) || events[0];
+
   return (
-    <main className="bg-[#f5f2ef]">
+    <main className="w-full">
 
-        {/* SERVE THE WORLD */}
-      <section className="relative py-32">
-        <div className="absolute inset-0">
-          <Image src="/images/church.jpg" alt="Church" fill className="object-cover" priority />
-          <div className="absolute" />
-        </div>
-
-        <div className="relative max-w-6xl mx-auto px-6">
-          <Reveal delayMs={60}>
-            <Link href="/blog/how-to-show-compassion">
-              <div className="bg-white p-12 md:p-16 max-w-xl shadow-lg cursor-pointer hover:shadow-2xl transition">
-                <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                  WE WANT TO <br /> SERVE THE WORLD <br /> AROUND US
-                </h2>
-                <p className="text-gray-600 mb-6">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.
-                </p>
-                <button className="bg-[#F2C79B] text-black font-bold px-8 py-3 rounded-md hover:opacity-90 transition">
-                  VISIT
-                </button>
-              </div>
-            </Link>
-          </Reveal>
-        </div>
-      </section>
+      {/* HERO SECTION */}
+      <HeroSection
+        imageSrc="/images/church.jpg"
+        title="WE WANT TO SERVE THE WORLD AROUND US"
+        subtitle="Stay connected with the latest events, stories, and updates from our church community."
+        badge="Our Blog & Events"
+        height="70vh"
+      />
 
       {/* SHARE, INSPIRE, INNOVATE */}
-      <section className="py-24 bg-[#f5f2ef]">
+      <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6">
-          <p className="text-center uppercase text-xs font-bold tracking-widest text-[#c9a27e] mb-3">Read Our Blog</p>
-          <h2 className="text-center text-4xl font-bold mb-16">SHARE, INSPIRE, INNOVATE</h2>
+          <Reveal delayMs={60}>
+            <div className="text-center mb-16">
+              <p className="uppercase text-xs font-bold tracking-[0.2em] text-[#c9a27e] mb-3">Read Our Blog</p>
+              <h2 className="text-4xl font-bold">SHARE, INSPIRE, INNOVATE</h2>
+            </div>
+          </Reveal>
 
-          <div className="grid md:grid-cols-4 gap-8">
-            {[1, 2, 3, 4].map((item) => (
-              <Link key={item} href="/blog/how-to-show-compassion">
-                <div className="bg-[#fbf4ee] p-8 rounded hover:-translate-y-2 hover:shadow-lg transition duration-300">
-                  <p className="uppercase text-xs font-bold  tracking-widest text-[#c9a27e] mb-3">Relationship</p>
-                  <h3 className="font-bold mb-4">WATCH AND LISTEN <br /> TO OUR SERMONS</h3>
-                  <p className="text-sm text-gray-600 mb-6">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor.
-                  </p>
-                  <p className="text-sm font-medium">By Mathew Johnson</p>
-                  <p className="text-xs text-gray-500">Tuesday 13 May, 2021</p>
+          {events.length > 0 ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {events.slice(0, 4).map((event, i) => (
+                <Reveal key={event._id} delayMs={80 + i * 60}>
+                  <div className="group bg-gradient-to-br from-[#FFF8F0] to-[#FFF1E2] p-8 rounded-xl card-hover border border-[#F2C79B]/10">
+                    <p className="uppercase text-xs font-bold tracking-[0.2em] text-[#c9a27e] mb-3 capitalize">
+                      {event.category}
+                    </p>
+                    <h3 className="font-bold text-lg mb-4 group-hover:text-[#c9a27e] transition-colors">{event.title}</h3>
+                    <p className="text-sm text-gray-600 mb-6 line-clamp-3">{event.description}</p>
+                    <p className="text-sm font-medium text-gray-700">{event.location || "HHGC Church"}</p>
+                    <p className="text-xs text-gray-500">
+                      {event.date ? new Date(event.date).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : ""}
+                    </p>
+                    <div className="h-1 bg-gradient-to-r from-[#F2C79B] to-[#d4a574] mt-6 w-0 group-hover:w-full transition-all duration-500" />
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-4 gap-8">
+              {[1, 2, 3, 4].map((item) => (
+                <div key={item} className="bg-[#fbf4ee] p-8 rounded-xl">
+                  <p className="uppercase text-xs font-bold tracking-[0.2em] text-[#c9a27e] mb-3">Coming Soon</p>
+                  <h3 className="font-bold mb-4">STAY TUNED FOR UPDATES</h3>
+                  <p className="text-sm text-gray-600">New events and blog posts are coming soon.</p>
                   <div className="h-1 bg-[#e5b887] mt-6 w-full" />
                 </div>
-              </Link>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
-        </section>
-
-
-      {/* HEADER */}
-      <section className="py-20 text-center">
-        <p className="uppercase text-xs font-bold tracking-widest  mb-3">Our Blog</p>
-        <h1 className="text-4xl md:text-5xl font-bold">MOST RECENT POST</h1>
       </section>
 
       {/* FEATURED POST */}
-      <section className="pb-20">
-        <div className="max-w-6xl mx-auto bg-white p-10 rounded-lg grid md:grid-cols-2 gap-10 items-center">
-          <div className="relative w-full h-[320px]">
-            <Image src="/images/blog.jpg" alt="Blog" fill className="object-cover rounded" />
-          </div>
+      {featuredEvent && (
+        <section className="py-24 bg-[#FAF7F3]">
+          <div className="max-w-6xl mx-auto px-6">
+            <Reveal delayMs={60}>
+              <div className="text-center mb-12">
+                <p className="uppercase text-xs font-bold tracking-[0.2em] text-[#c9a27e] mb-3">Featured</p>
+                <h2 className="text-3xl md:text-4xl font-bold">FEATURED EVENT</h2>
+              </div>
+            </Reveal>
 
-          <div>
-            <div className="flex justify-between font-bold text-xs text-gray-500 mb-4">
-              <span>Tuesday 13 May, 2022</span>
-              <span>By John Mathew Doe</span>
-            </div>
-
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              CHURCH WAS DOING WHAT HE OFTEN DID WHEN DROPPED AN ORACLE
-            </h2>
-
-            <p className="text-gray-600 mb-6">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-            </p>
-
-            <Link href="/blog/how-to-show-compassion" className="bg-[#F2C79B] text-black px-6 py-3 rounded-md font-semibold hover:bg-[#d6a46f] transition">
-              READ MORE
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ALL BLOG POSTS */}
-      <section className="py-20">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-center text-3xl font-bold mb-16">ALL BLOG POSTS</h2>
-
-          <div className="grid md:grid-cols-4 gap-8">
-            {[
-              "THE BEST WAY TO INSPIRE PEOPLE",
-              "HOW TO SHOW COMPASSION",
-              "THE BIBLICAL PURPOSE OF MONEY",
-              "THE BEST WAY TO INSPIRE PEOPLE",
-              "WHAT IT MEANS TO BE A DISCIPLE",
-              "WHAT IT MEANS TO BELIEVE",
-              "THE MODERN CHURCH IN 2022",
-            ].map((title, i) => (
-              <Link key={i} href="/blog/how-to-show-compassion" className="group bg-white p-8 rounded-lg hover:shadow-lg transition">
-                <p className="text-xs uppercase font-bold tracking-widest text-[#c9a27e] mb-3">Relationship</p>
-                <h3 className="font-bold mb-4 group-hover:text-[#c9a27e] transition">{title}</h3>
-                <p className="text-sm text-gray-600 mb-6">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-                <div className="text-xs text-gray-500">
-                  <p>By Mathew Johnson</p>
-                  <p>Tuesday 13 May, 2021</p>
+            <Reveal delayMs={120}>
+              <div className="bg-white p-10 rounded-2xl shadow-sm grid md:grid-cols-2 gap-10 items-center">
+                <div className="relative w-full h-[320px] img-zoom rounded-xl overflow-hidden">
+                  <Image src="/images/blog.jpg" alt="Featured" fill className="object-cover" />
                 </div>
-                <div className="h-1 bg-[#e5b887] mt-6 w-0 group-hover:w-full transition-all duration-300" />
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
 
-     
+                <div>
+                  <div className="flex justify-between font-bold text-xs text-gray-500 mb-4">
+                    <span>{featuredEvent.date ? new Date(featuredEvent.date).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : ""}</span>
+                    <span className="capitalize">{featuredEvent.category}</span>
+                  </div>
+
+                  <h2 className="text-2xl md:text-3xl font-bold mb-4">
+                    {featuredEvent.title}
+                  </h2>
+
+                  <p className="text-gray-600 mb-6 leading-relaxed">
+                    {featuredEvent.description}
+                  </p>
+
+                  {featuredEvent.time && <p className="text-sm text-gray-500 mb-2">🕐 {featuredEvent.time}</p>}
+                  {featuredEvent.location && <p className="text-sm text-gray-500 mb-6">📍 {featuredEvent.location}</p>}
+
+                  <button className="bg-gradient-to-r from-[#F2C79B] to-[#d4a574] text-black px-6 py-3 rounded-xl font-semibold hover:shadow-lg transition">
+                    LEARN MORE
+                  </button>
+                </div>
+              </div>
+            </Reveal>
+          </div>
+        </section>
+      )}
+
+      {/* ALL EVENTS */}
+      {events.length > 0 && (
+        <section className="py-24 bg-white">
+          <div className="max-w-6xl mx-auto px-6">
+            <Reveal delayMs={60}>
+              <h2 className="text-center text-3xl font-bold mb-16">ALL EVENTS & POSTS</h2>
+            </Reveal>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {events.map((event, i) => (
+                <Reveal key={event._id} delayMs={80 + i * 40}>
+                  <div className="group bg-gradient-to-br from-[#FFF8F0] to-[#FFF1E2] p-8 rounded-xl card-hover border border-[#F2C79B]/10">
+                    <p className="text-xs uppercase font-bold tracking-[0.2em] text-[#c9a27e] mb-3 capitalize">
+                      {event.category}
+                    </p>
+                    <h3 className="font-bold mb-4 group-hover:text-[#c9a27e] transition-colors">{event.title}</h3>
+                    <p className="text-sm text-gray-600 mb-6 line-clamp-2">{event.description}</p>
+                    <div className="text-xs text-gray-500">
+                      {event.location && <p>{event.location}</p>}
+                      <p>{event.date ? new Date(event.date).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : ""}</p>
+                    </div>
+                    <div className="h-1 bg-gradient-to-r from-[#F2C79B] to-[#d4a574] mt-6 w-0 group-hover:w-full transition-all duration-500" />
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
     </main>
   );
