@@ -1,6 +1,12 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://oluwasheun9721:Samuel9721@cluster0.xdahzzg.mongodb.net/hhgc?retryWrites=true&w=majority&appName=Cluster0";
+const MONGODB_URL = process.env.MONGODB_URL;
+if (!MONGODB_URL) {
+  throw new Error("Missing MONGODB_URL environment variable");
+}
 
 let cached = global.mongoose;
 
@@ -21,7 +27,7 @@ export default async function connectDB() {
     };
 
     cached.promise = mongoose
-      .connect(MONGODB_URI, opts)
+      .connect(MONGODB_URL, opts)
       .then((mongoose) => {
         console.log("✅ MongoDB connected successfully");
         return mongoose;
