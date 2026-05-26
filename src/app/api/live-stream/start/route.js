@@ -35,7 +35,7 @@ export async function POST(req) {
 
         // Generate a unique stream code
         const streamCode = uuidv4().split("-")[0].toUpperCase();
-        
+
         // Create recordings directory if it doesn't exist
         const recordingsDir = path.join(process.cwd(), "public", "recordings");
         if (!fs.existsSync(recordingsDir)) {
@@ -45,7 +45,7 @@ export async function POST(req) {
         // Create recording file path
         const recordingFileName = `${streamCode}-${Date.now()}.wav`;
         const recordingPath = path.join(recordingsDir, recordingFileName);
-        
+
         // Create empty recording file
         fs.writeFileSync(recordingPath, "");
 

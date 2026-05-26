@@ -24,15 +24,12 @@ export async function GET(req, { params }) {
 
         // If stream is still live, stream the live file
         if (stream.isLive) {
-            return new NextResponse(
-                fs.createReadStream(stream.recordingPath),
-                {
-                    headers: {
-                        "Content-Type": "audio/webm",
-                        "Accept-Ranges": "bytes",
-                    },
+            return new NextResponse(fs.createReadStream(stream.recordingPath), {
+                headers: {
+                    "Content-Type": "audio/webm",
+                    "Accept-Ranges": "bytes",
                 },
-            );
+            });
         }
 
         // If stream is stopped, serve the complete file
@@ -47,10 +44,10 @@ export async function GET(req, { params }) {
             const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
             const chunksize = end - start + 1;
 
-            const fileStream = fs.createReadStream(
-                stream.recordingPath,
-                { start, end },
-            );
+            const fileStream = fs.createReadStream(stream.recordingPath, {
+                start,
+                end,
+            });
 
             return new NextResponse(fileStream, {
                 status: 206,
@@ -64,15 +61,12 @@ export async function GET(req, { params }) {
         }
 
         // Return full file
-        return new NextResponse(
-            fs.createReadStream(stream.recordingPath),
-            {
-                headers: {
-                    "Content-Type": "audio/webm",
-                    "Content-Length": fileSize.toString(),
-                },
+        return new NextResponse(fs.createReadStream(stream.recordingPath), {
+            headers: {
+                "Content-Type": "audio/webm",
+                "Content-Length": fileSize.toString(),
             },
-        );
+        });
     } catch (err) {
         console.error("Stream error:", err);
         return new NextResponse("Internal server error", { status: 500 });

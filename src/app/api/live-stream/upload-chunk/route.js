@@ -18,7 +18,7 @@ export async function POST(req) {
 
         // Get the audio blob from request
         const buffer = await req.arrayBuffer();
-        
+
         // Get streamCode from query params
         const { searchParams } = new URL(req.url);
         const streamCode = searchParams.get("streamCode");

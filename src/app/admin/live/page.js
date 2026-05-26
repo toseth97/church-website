@@ -34,7 +34,7 @@ export default function AdminLivePage() {
     });
     const [error, setError] = useState("");
     const [copied, setCopied] = useState(false);
-    
+
     // Audio recording references
     const mediaRecorderRef = useRef(null);
     const streamRef = useRef(null);
@@ -82,21 +82,20 @@ export default function AdminLivePage() {
 
             // Request microphone access
             try {
-                const mediaStream = await navigator.mediaDevices.getUserMedia(
-                    {
-                        audio: {
-                            echoCancellation: true,
-                            noiseSuppression: true,
-                            autoGainControl: false,
-                        },
+                const mediaStream = await navigator.mediaDevices.getUserMedia({
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: false,
                     },
-                );
+                });
 
                 streamRef.current = mediaStream;
 
                 // Create audio context for recording
-                const audioContext = new (window.AudioContext ||
-                    window.webkitAudioContext)();
+                const audioContext = new (
+                    window.AudioContext || window.webkitAudioContext
+                )();
                 audioContextRef.current = audioContext;
 
                 const mediaRecorder = new MediaRecorder(mediaStream, {
