@@ -40,7 +40,7 @@ export default function Navbar() {
                 <nav className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
                     <Link href="/" className="flex items-center group">
                         <Image
-                            src="/images/HHGC_LOGO.jpeg"
+                            src="/images/HHGC_LOGO.png"
                             alt="HHGC Logo"
                             width={80}
                             height={80}

@@ -8,7 +8,8 @@ export const dynamic = "force-dynamic";
 
 async function getTestimonies() {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/api/testimonies?limit=10`, {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const res = await fetch(`${baseUrl}/api/testimonies?limit=10`, {
       cache: "no-store",
     });
     const data = await res.json();
@@ -20,7 +21,8 @@ async function getTestimonies() {
 
 async function getEvents() {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/api/events?limit=4`, {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const res = await fetch(`${baseUrl}/api/events?limit=4`, {
       cache: "no-store",
     });
     const data = await res.json();
@@ -32,7 +34,8 @@ async function getEvents() {
 
 async function getSermons() {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/api/sermons?limit=3`, {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    const res = await fetch(`${baseUrl}/api/sermons?limit=3`, {
       cache: "no-store",
     });
     const data = await res.json();
