@@ -39,13 +39,13 @@ export default function HeroSection({
             </div>
 
             {/* Content */}
-            <div className="hero-content absolute inset-0 flex items-center">
+            <div className="hero-content absolute inset-0 flex items-center justify-start">
                 <div className="max-w-7xl mx-auto px-6 w-full">
                     {/* Badge */}
                     {badge && (
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-6 animate-fadeInUp">
                             <span className="w-2 h-2 rounded-full bg-[#F2C79B]"></span>
-                            <span className="text-xs font-bold uppercase tracking-widest text-white/80">
+                            <span className="text-xs sm:text-sm font-bold uppercase tracking-widest text-white/80">
                                 {badge}
                             </span>
                         </div>
@@ -53,7 +53,7 @@ export default function HeroSection({
 
                     {/* Title */}
                     <h1
-                        className="text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight max-w-3xl animate-fadeInUp"
+                        className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight max-w-3xl animate-fadeInUp"
                         style={{ animationDelay: "0.15s" }}
                     >
                         {title}
@@ -62,7 +62,7 @@ export default function HeroSection({
                     {/* Subtitle */}
                     {subtitle && (
                         <p
-                            className="text-lg md:text-xl text-white/70 mt-4 max-w-2xl animate-fadeInUp"
+                            className="text-base sm:text-lg md:text-xl text-white/70 mt-4 max-w-2xl animate-fadeInUp"
                             style={{ animationDelay: "0.3s" }}
                         >
                             {subtitle}
