@@ -31,7 +31,7 @@ export default function Footer() {
                             >
                                 <div>
                                     <Image
-                                        src="/images/HHGC_LOGO.png"
+                                        src="/images/HHGC.png"
                                         alt="HHGC Logo"
                                         width={200}
                                         height={200}

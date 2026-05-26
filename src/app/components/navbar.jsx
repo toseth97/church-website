@@ -114,7 +114,7 @@ export default function Navbar() {
                 {/* Logo */}
                 <Link href="/" className="flex items-center group">
                     <Image
-                        src="/images/HHGC_LOGO.png"
+                        src="/images/HHGC.png"
                         alt="HHGC Logo"
                         width={80}
                         height={80}
