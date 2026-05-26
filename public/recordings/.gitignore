@@ -1,0 +1,5 @@
+# This directory contains recorded audio files
+# These are generated dynamically and should not be committed
+
+# Keep the directory in git
+!.gitkeep

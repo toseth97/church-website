@@ -37,6 +37,14 @@ const LiveStreamSchema = new mongoose.Schema(
             ref: "Recording",
             default: null,
         },
+        recordingPath: {
+            type: String,
+            default: null,
+        },
+        recordingFileName: {
+            type: String,
+            default: null,
+        },
         isActive: {
             type: Boolean,
             default: true,

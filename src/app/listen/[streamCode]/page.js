@@ -108,7 +108,7 @@ export default function ListenerPage() {
             {/* STREAM PLAYER */}
             <section className="py-24 bg-white">
                 <div className="max-w-4xl mx-auto px-6">
-                    {stream?.isLive && stream?.audioUrl ? (
+                    {stream?.isLive ? (
                         <div className="bg-gradient-to-br from-[#1a1a2e] to-[#16213e] rounded-2xl shadow-2xl overflow-hidden">
                             {/* Stream Header */}
                             <div className="flex items-center justify-between p-6 border-b border-white/10">
@@ -134,32 +134,17 @@ export default function ListenerPage() {
                                 </div>
                             </div>
 
-                            {/* Video Player (if available) */}
-                            {stream?.videoUrl && (
-                                <div className="aspect-video bg-black">
-                                    <iframe
-                                        src={stream.videoUrl}
-                                        className="w-full h-full"
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                        allowFullScreen
-                                    ></iframe>
-                                </div>
-                            )}
-
                             {/* Audio Player */}
-                            <div
-                                className={`p-8 ${stream?.videoUrl ? "border-t border-white/10" : ""}`}
-                            >
+                            <div className="p-8">
                                 <audio
                                     controls
                                     autoPlay
-                                    src={stream.audioUrl}
+                                    src={`/api/live-stream/listen/${stream.streamCode}`}
                                     className="w-full"
                                 />
                                 <p className="text-xs text-white/40 mt-4 text-center">
-                                    {stream?.videoUrl
-                                        ? "Press play to listen to the audio stream"
-                                        : "If audio doesn't start automatically, press the play button above."}
+                                    If audio doesn't start automatically, press
+                                    the play button above.
                                 </p>
                             </div>
                         </div>

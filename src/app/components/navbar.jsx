@@ -6,8 +6,15 @@ import { useEffect, useState } from "react";
 import NavbarAdminClient from "./navbarAdminClient.jsx";
 
 export default function Navbar() {
+    const [mounted, setMounted] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
+
+    useEffect(() => {
+        // Deterministic initial HTML (mounted=false). Then enable interactive updates on mount.
+        const t = requestAnimationFrame(() => setMounted(true));
+        return () => cancelAnimationFrame(t);
+    }, []);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -25,6 +32,74 @@ export default function Navbar() {
         { name: "Live Stream", path: "/live" },
         { name: "Recordings", path: "/recordings" },
     ];
+
+    if (!mounted) {
+        // Render a deterministic version for the initial SSR/first client render.
+        return (
+            <header className="fixed top-0 left-0 w-full z-50 transition-all duration-500 bg-black/70 backdrop-blur border-b border-white/10">
+                <nav className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+                    <Link href="/" className="flex items-center group">
+                        <Image
+                            src="/images/HHGC_LOGO.jpeg"
+                            alt="HHGC Logo"
+                            width={80}
+                            height={80}
+                            className="rounded-xl object-contain transition-transform duration-300 group-hover:scale-110 select-none invert-[.15]"
+                            priority
+                        />
+                    </Link>
+
+                    {/* Keep structure stable to avoid hydration mismatches */}
+                    <ul className="hidden md:flex items-center gap-8 text-sm uppercase text-white/80 tracking-widest">
+                        {[
+                            { name: "Home", path: "/" },
+                            { name: "About Us", path: "/about" },
+                            { name: "Sermon", path: "/sermon" },
+                            { name: "Blog", path: "/blog" },
+                            { name: "Live Stream", path: "/live" },
+                            { name: "Recordings", path: "/recordings" },
+                        ].map((link) => (
+                            <li key={link.name}>
+                                <Link
+                                    href={link.path}
+                                    className="relative cursor-pointer"
+                                >
+                                    {link.name}
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+
+                    <Link
+                        href="/contact"
+                        className="hidden md:inline-flex bg-gradient-to-r from-[#F2C79B] to-[#d4a574] px-6 py-2.5 rounded-xl text-sm font-semibold cursor-pointer hover:shadow-lg hover:shadow-[#F2C79B]/25 transition-all duration-300 text-black"
+                    >
+                        Contact Us
+                    </Link>
+
+                    <button
+                        className="md:hidden text-white p-2"
+                        aria-label="Toggle menu"
+                        type="button"
+                    >
+                        <svg
+                            className="w-6 h-6"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M4 6h16M4 12h16M4 18h16"
+                            />
+                        </svg>
+                    </button>
+                </nav>
+            </header>
+        );
+    }
 
     return (
         <header
@@ -86,6 +161,7 @@ export default function Navbar() {
                     onClick={() => setMobileOpen(!mobileOpen)}
                     className="md:hidden text-white p-2"
                     aria-label="Toggle menu"
+                    type="button"
                 >
                     {mobileOpen ? (
                         <svg

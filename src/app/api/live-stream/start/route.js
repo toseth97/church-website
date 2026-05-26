@@ -3,6 +3,8 @@ import { v4 as uuidv4 } from "uuid";
 import { requireAdmin } from "@/server/lib/auth.js";
 import connectDB from "@/server/lib/db.js";
 import LiveStream from "@/server/models/LiveStream.js";
+import fs from "fs";
+import path from "path";
 
 export async function POST(req) {
     try {
@@ -16,7 +18,14 @@ export async function POST(req) {
 
         await connectDB();
         const body = await req.json();
-        const { audioUrl, videoUrl, title } = body || {};
+        const { title } = body || {};
+
+        if (!title || !title.trim()) {
+            return NextResponse.json(
+                { ok: false, error: "Stream title is required" },
+                { status: 400 },
+            );
+        }
 
         // Stop any existing live streams
         await LiveStream.updateMany(
@@ -24,17 +33,32 @@ export async function POST(req) {
             { isLive: false, stoppedAt: new Date() },
         );
 
-        // Generate a unique stream code for shareable URL
-        const streamCode = uuidv4().split("-")[0].toUpperCase(); // Short unique code
+        // Generate a unique stream code
+        const streamCode = uuidv4().split("-")[0].toUpperCase();
+        
+        // Create recordings directory if it doesn't exist
+        const recordingsDir = path.join(process.cwd(), "public", "recordings");
+        if (!fs.existsSync(recordingsDir)) {
+            fs.mkdirSync(recordingsDir, { recursive: true });
+        }
+
+        // Create recording file path
+        const recordingFileName = `${streamCode}-${Date.now()}.wav`;
+        const recordingPath = path.join(recordingsDir, recordingFileName);
+        
+        // Create empty recording file
+        fs.writeFileSync(recordingPath, "");
 
         // Create new live stream
         const stream = new LiveStream({
             isLive: true,
-            audioUrl: audioUrl || null,
-            videoUrl: videoUrl || null,
-            title: title || "Live Worship Service",
+            audioUrl: null,
+            videoUrl: null,
+            title: title.trim(),
             startedAt: new Date(),
             streamCode: streamCode,
+            recordingPath: recordingPath,
+            recordingFileName: recordingFileName,
         });
 
         await stream.save();
@@ -47,8 +71,6 @@ export async function POST(req) {
             current: {
                 id: stream._id,
                 isLive: true,
-                audioUrl: stream.audioUrl,
-                videoUrl: stream.videoUrl,
                 title: stream.title,
                 startedAt: stream.startedAt,
                 streamCode: stream.streamCode,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 
 function StatusPill({ live }) {
@@ -34,6 +34,12 @@ export default function AdminLivePage() {
     });
     const [error, setError] = useState("");
     const [copied, setCopied] = useState(false);
+    
+    // Audio recording references
+    const mediaRecorderRef = useRef(null);
+    const streamRef = useRef(null);
+    const audioContextRef = useRef(null);
+    const processorRef = useRef(null);
 
     async function refresh() {
         const res = await fetch("/api/live-stream/status");
@@ -56,20 +62,85 @@ export default function AdminLivePage() {
         setLoading(true);
         setError("");
         try {
+            // Start recording on server
             const res = await fetch("/api/live-stream/start", {
                 method: "POST",
                 headers: { "content-type": "application/json" },
                 body: JSON.stringify({
-                    title: title || "Live Worship Service",
+                    title: title.trim(),
                 }),
             });
             const data = await res.json().catch(() => ({}));
             if (!res.ok || !data?.ok) {
                 setError(data?.error || "Failed to start");
+                setLoading(false);
                 return;
             }
-            setTitle("");
-            await refresh();
+
+            // Store stream code for audio upload
+            const streamCode = data.current.streamCode;
+
+            // Request microphone access
+            try {
+                const mediaStream = await navigator.mediaDevices.getUserMedia(
+                    {
+                        audio: {
+                            echoCancellation: true,
+                            noiseSuppression: true,
+                            autoGainControl: false,
+                        },
+                    },
+                );
+
+                streamRef.current = mediaStream;
+
+                // Create audio context for recording
+                const audioContext = new (window.AudioContext ||
+                    window.webkitAudioContext)();
+                audioContextRef.current = audioContext;
+
+                const mediaRecorder = new MediaRecorder(mediaStream, {
+                    mimeType: "audio/webm",
+                });
+
+                mediaRecorderRef.current = mediaRecorder;
+
+                // Handle audio data
+                mediaRecorder.ondataavailable = async (event) => {
+                    if (event.data.size > 0) {
+                        // Send audio chunk to server
+                        try {
+                            await fetch(
+                                `/api/live-stream/upload-chunk?streamCode=${streamCode}`,
+                                {
+                                    method: "POST",
+                                    body: event.data,
+                                },
+                            );
+                        } catch (err) {
+                            console.error("Failed to upload audio chunk:", err);
+                        }
+                    }
+                };
+
+                // Start recording with timeslice to send chunks regularly
+                mediaRecorder.start(1000); // Send chunks every 1 second
+
+                setTitle("");
+                await refresh();
+            } catch (micErr) {
+                setError(
+                    "Could not access microphone. Please check permissions.",
+                );
+                console.error("Microphone error:", micErr);
+                // Stop the server-side recording if mic access failed
+                await fetch("/api/live-stream/stop", {
+                    method: "POST",
+                    headers: { "content-type": "application/json" },
+                });
+            }
+        } catch (err) {
+            setError(err.message || "Failed to start stream");
         } finally {
             setLoading(false);
         }
@@ -79,6 +150,27 @@ export default function AdminLivePage() {
         setLoading(true);
         setError("");
         try {
+            // Stop microphone recording
+            if (mediaRecorderRef.current) {
+                mediaRecorderRef.current.stop();
+                mediaRecorderRef.current = null;
+            }
+
+            // Stop audio context
+            if (audioContextRef.current) {
+                audioContextRef.current.close();
+                audioContextRef.current = null;
+            }
+
+            // Stop media stream
+            if (streamRef.current) {
+                streamRef.current.getTracks().forEach((track) => {
+                    track.stop();
+                });
+                streamRef.current = null;
+            }
+
+            // Stop the live stream on server
             const res = await fetch("/api/live-stream/stop", {
                 method: "POST",
                 headers: { "content-type": "application/json" },
@@ -166,8 +258,13 @@ export default function AdminLivePage() {
                                     onClick={startStream}
                                     className="w-full bg-black text-white font-semibold py-3 rounded-lg hover:bg-gray-800 transition disabled:opacity-60"
                                 >
-                                    {loading ? "Starting..." : "▶ Start Stream"}
+                                    {loading
+                                        ? "Starting... (Allow microphone access)"
+                                        : "🎙️ Start Stream & Record"}
                                 </button>
+                                <p className="text-xs text-gray-500 text-center">
+                                    You'll be asked to allow microphone access
+                                </p>
                             </div>
                         ) : (
                             <>
@@ -239,11 +336,12 @@ export default function AdminLivePage() {
                         </h3>
                         <div className="text-sm text-blue-800 space-y-2">
                             <p>1. Enter a stream title</p>
-                            <p>2. Click "Start Stream" to go live</p>
-                            <p>3. A shareable link will appear</p>
-                            <p>4. Share the link with listeners</p>
-                            <p>5. When done, click "Stop Stream"</p>
-                            <p>6. Audio is automatically saved</p>
+                            <p>2. Click "Start Stream & Record"</p>
+                            <p>3. Allow microphone access</p>
+                            <p>4. Your audio is recorded</p>
+                            <p>5. Share the link with listeners</p>
+                            <p>6. When done, click "Stop Stream"</p>
+                            <p>7. Recording is automatically saved</p>
                         </div>
                     </div>
 
